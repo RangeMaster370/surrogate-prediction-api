@@ -1,0 +1,13 @@
+{
+  "model_version": "4deec4b25c",
+  "training_runs": 40,
+  "test_points": 300,
+  "rmse_degC": 0.8234509115776765,
+  "interval95_coverage": 0.9866666666666667,
+  "single_request_p50_ms": 1.0080700000685283,
+  "single_request_p95_ms": 1.8199308500243196,
+  "batch100_p50_ms": 2.408488999947167,
+  "invalid_inputs_sent": 4,
+  "invalid_inputs_rejected_422": 4,
+  "note": "Latency measured in process with FastAPI TestClient on the build machine: no network, no container, no cloud."
+}
