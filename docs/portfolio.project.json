@@ -1,0 +1,96 @@
+{
+  "id": "api",
+  "number": "10",
+  "field": "ML engineering",
+  "title": "Surrogate prediction API",
+  "card_detail": "FastAPI service with validated inputs, uncertainty, tests, Dockerfile and CI file.",
+  "context": "A small FastAPI service that serves the Gaussian-process surrogate with a 95 % interval. It shows the engineering around a model: input validation, batching, reproducible model versions, tests and container and CI files. Built in October 2026 as a practice project. It is not deployed to any cloud, and the Dockerfile and CI workflow were written but not built or run.",
+  "stamp": "Python · FastAPI · pytest",
+  "statement": {
+    "tool": "FastAPI, pydantic and a NumPy Gaussian process",
+    "built": "Four endpoints with strict validation, batch prediction, 14 httpx tests, a Dockerfile and a GitHub Actions workflow",
+    "result": "RMSE 0.82 degC on 300 unseen points; single request p50 1.0 ms in process; 4 of 4 invalid inputs rejected"
+  },
+  "flow_label": "Request to validation to model to response",
+  "flow": [
+    [
+      "Request",
+      "JSON over HTTP",
+      "/predict · /predict/batch"
+    ],
+    [
+      "Validation",
+      "Pydantic schemas",
+      "Bounds · no extra fields"
+    ],
+    [
+      "Model",
+      "Gaussian process",
+      "Trained once at start-up"
+    ],
+    [
+      "Response",
+      "Mean and 95 % interval",
+      "Model version hash"
+    ]
+  ],
+  "method_note": "The model trains once in the application lifespan and is kept in memory, so a request costs only a prediction. The version is a hash of the training data, which makes responses traceable to a model.",
+  "plots": [
+    {
+      "file": "latency.svg",
+      "label": "Latency",
+      "alt": "In-process request latency against batch size",
+      "caption": "Generated output · in-process latency, no network"
+    }
+  ],
+  "spec": [
+    [
+      "Endpoints",
+      "GET /health, GET /model, POST /predict, POST /predict/batch"
+    ],
+    [
+      "Validation",
+      "Ambient -10 to 35, EVs 0 to 250, shifted share 0 to 1, batch 1 to 100"
+    ],
+    [
+      "Model",
+      "40 synthetic simulator runs, fixed seed"
+    ],
+    [
+      "Status",
+      "Not deployed to cloud; Docker and CI files not yet run"
+    ]
+  ],
+  "results_head": [
+    "Check",
+    "Result"
+  ],
+  "results": [
+    [
+      "Accuracy on 300 unseen points",
+      "RMSE 0.82 degC"
+    ],
+    [
+      "95 % interval coverage",
+      "0.99"
+    ],
+    [
+      "Single request latency, in process",
+      "p50 1.0 ms, p95 1.8 ms"
+    ],
+    [
+      "Batch of 100, in process",
+      "p50 2.4 ms"
+    ],
+    [
+      "Invalid inputs",
+      "4 of 4 rejected with 422"
+    ]
+  ],
+  "decisions": [
+    "Train at start-up for simplicity; a real service would load a stored model.",
+    "Reject unknown fields, so client typos fail loudly.",
+    "Measure latency in process and say so, rather than imply network figures."
+  ],
+  "verification": "14 tests through the FastAPI test client cover health, model info, accuracy against the simulator, monotonic behaviour, seven invalid-input cases, batch against single calls, batch limits and a reproducible model version."
+}
